@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My IP Location</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; text-align: center; padding: 20px; background: #f0f2f5; margin: 0; }
+        #map { height: 400px; width: 100%; max-width: 600px; margin: 20px auto; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .info-card { background: white; padding: 20px; border-radius: 15px; max-width: 600px; margin: 0 auto 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        h2 { margin-top: 0; color: #333; }
+        p { color: #666; line-height: 1.5; }
+        .loading { color: #0088cc; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="info-card">
+        <h2>📍 Your Approximate Location</h2>
+        <p id="status" class="loading">Detecting your location based on your IP address...</p>
+        <p id="details"></p>
+    </div>
+    
+    <div id="map"></div>
+
+    <!-- Leaflet Map JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Fetch the user's IP and location data
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.latitude && data.longitude) {
+                    var lat = data.latitude;
+                    var lon = data.longitude;
+                    var city = data.city || 'Unknown City';
+                    var region = data.region || 'Unknown Region';
+                    var ip = data.ip;
+
+                    // Center the map on their location and add a pin
+                    map.setView([lat, lon], 12);
+                    L.marker([lat, lon]).addTo(map)
+                        .bindPopup(`<b>${city}, ${region}</b><br>IP: ${ip}`)
+                        .openPopup();
+
+                    // Update the text on the screen
+                    document.getElementById('status').innerText = 'Location Detected!';
+                    document.getElementById('status').classList.remove('loading');
+                    document.getElementById('details').innerHTML = `You are approximately in <b>${city}, ${region}</b>.<br>(Based on your IP: ${ip})`;
+                } else {
+                    document.getElementById('status').innerText = 'Could not detect location.';
+                }
+            })
+            .catch(err => {
+                document.getElementById('status').innerText = 'Error detecting location. Please refresh.';
+                console.error(err);
+            });
+    </script>
+</body>
+</html>
