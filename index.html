@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My IP Location</title>
+    <title>My Location</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Leaflet Map CSS -->
@@ -18,8 +18,8 @@
 <body>
 
     <div class="info-card">
-        <h2>📍 Your Approximate Location</h2>
-        <p id="status" class="loading">Detecting your location based on your IP address...</p>
+        <h2>📍 My Location</h2>
+        <p id="status" class="loading">Detecting my location...</p>
         <p id="details"></p>
     </div>
     
@@ -34,7 +34,7 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Fetch the user's IP and location data
+        // Fetch the location data
         fetch('https://ipapi.co/json/')
             .then(response => response.json())
             .then(data => {
@@ -43,18 +43,17 @@
                     var lon = data.longitude;
                     var city = data.city || 'Unknown City';
                     var region = data.region || 'Unknown Region';
-                    var ip = data.ip;
 
-                    // Center the map on their location and add a pin
+                    // Center the map on the location and add a pin
                     map.setView([lat, lon], 12);
                     L.marker([lat, lon]).addTo(map)
-                        .bindPopup(`<b>${city}, ${region}</b><br>IP: ${ip}`)
+                        .bindPopup(`<b>${city}, ${region}</b>`)
                         .openPopup();
 
-                    // Update the text on the screen
+                    // Update the text on the screen (No IP shown!)
                     document.getElementById('status').innerText = 'Location Detected!';
                     document.getElementById('status').classList.remove('loading');
-                    document.getElementById('details').innerHTML = `You are approximately in <b>${city}, ${region}</b>.<br>(Based on your IP: ${ip})`;
+                    document.getElementById('details').innerHTML = `My location is approximately in <b>${city}, ${region}</b>.`;
                 } else {
                     document.getElementById('status').innerText = 'Could not detect location.';
                 }
